@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_session import Session
-from flask_login import LoginManager, UserMixin, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user,current_user
 from flask_restful import Api # type: ignore
 # from models import Bus, Route, Trip, Review, CanceledTrip
 from flask import Flask
@@ -95,18 +95,32 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register():
+    email = request.json.get('email')
     username = request.json.get('username')
     password = request.json.get('password')
+
+    # Check if email is provided
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
 
     # Check if user exists
     if User.query.filter_by(username=username).first():
         return jsonify({'error': 'User already exists'}), 400
 
     # Create new user
-    new_user = User(username=username, password_hash=password)
+    new_user = User(username=username, email=email, password_hash=password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User registered successfully'})
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    if current_user.is_authenticated:
+        logout_user()
+        return jsonify({'message': 'Logout successful'})
+    else:
+        return jsonify({'error': 'User not logged in'}), 401
+
 
 @app.route('/')
 def home():
