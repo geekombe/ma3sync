@@ -1,4 +1,5 @@
 from flask import Flask
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -40,3 +41,26 @@ class CanceledTrip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'), nullable=False)
     reason = db.Column(db.Text)
+
+class Schedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'), nullable=False)
+    departure_time = db.Column(db.DateTime, nullable=False)
+    available_seats = db.Column(db.Integer, nullable=False)
+    total_seats = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+    # Define relationships
+    route = db.relationship('Route', backref=db.backref('schedules', lazy=True))
+
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('schedule.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    seat_number = db.Column(db.Integer, nullable=False)
+    booking_time = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), nullable=False, default='Pending')
+
+     # Define relationships
+    schedule = db.relationship('Schedule', backref=db.backref('bookings', lazy=True))
+    user = db.relationship('User', backref=db.backref('bookings', lazy=True))

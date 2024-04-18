@@ -1,10 +1,10 @@
 from app import app, db
-from models import User, Bus, Route, Trip, Review, CanceledTrip
-
+from models import User, Bus, Route, Trip, Review, CanceledTrip, Booking, Schedule
+from datetime import datetime
 
 def seed_database():
     with app.app_context():
-    # Create users
+        # Create users
         user1 = User(username='user1', email='user1@example.com', password_hash='hashed_password_1')
         user2 = User(username='user2', email='user2@example.com', password_hash='hashed_password_2')
         user3 = User(username='user3', email='user3@example.com', password_hash='hashed_password_3')
@@ -32,6 +32,24 @@ def seed_database():
         # Create canceled trips
         canceled_trip1 = CanceledTrip(trip_id=1, reason='Weather conditions')
         canceled_trip2 = CanceledTrip(trip_id=2, reason='Unexpected maintenance')
+
+        # Create sample data for schedules
+        schedule1 = Schedule(route_id=1, departure_time=datetime.utcnow(), available_seats=50, total_seats=50, price=20.0)
+        schedule2 = Schedule(route_id=2, departure_time=datetime.utcnow(), available_seats=40, total_seats=40, price=25.0)
+        schedule3 = Schedule(route_id=3, departure_time=datetime.utcnow(), available_seats=60, total_seats=60, price=30.0)
+
+        # Add schedules to the session
+        db.session.add_all([schedule1, schedule2, schedule3])
+        db.session.commit()
+
+        # Create sample data for bookings
+        booking1 = Booking(schedule_id=1, user_id=1, seat_number=1, booking_time=datetime.utcnow(), status='Confirmed')
+        booking2 = Booking(schedule_id=2, user_id=2, seat_number=1, booking_time=datetime.utcnow(), status='Confirmed')
+        booking3 = Booking(schedule_id=3, user_id=3, seat_number=1, booking_time=datetime.utcnow(), status='Confirmed')
+
+        # Add bookings to the session
+        db.session.add_all([booking1, booking2, booking3])
+        db.session.commit()
 
         # Add objects to the session
         db.session.add_all([user1, user2, user3, bus1, bus2, bus3, route1, route2, route3,
