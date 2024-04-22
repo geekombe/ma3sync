@@ -1,7 +1,7 @@
 ### 1. Clone Your Repository
 
 ```bash
-git clone https://github.com/geekombe/ma3sync
+git clone https://github.com/geekombe/ma3sync.git
 cd ma3sync
 ```
 
